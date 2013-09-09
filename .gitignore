@@ -1,0 +1,32 @@
+# Object files
+*.o
+*.crf
+*.lnp
+*.plg
+*.iex
+*.d
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+*.def
+
+# Executables
+*.exe
+*.out
+*.app
+*.axf
+
+# Private documents
+*.pdf
+
+# Public documents
+*.bak
+*.Haunstetter
+*.dep
