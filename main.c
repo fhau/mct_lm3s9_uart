@@ -39,7 +39,7 @@ void SysTickISR()
 
 int main()
 {
-	volatile unsigned long ulLoop;
+	volatile unsigned long ulIOBits;
 	
 	//
 	// Initialize the System Tick Timer for 333 ms light change, then
@@ -48,22 +48,32 @@ int main()
 	NVIC_ST_CURRENT_R = NVIC_ST_RELOAD_R = SYSCLK / (3 * 2);
 
 	//
-	// Enable the GPIO port that is used for the on-board LED.
+	// Enable the GPIO ports used.
 	//
-	SYSCTL_RCGC2_R = SYSCTL_RCGC2_GPIOF;
+	SYSCTL_RCGC2_R = SYSCTL_RCGC2_GPIOF | SYSCTL_RCGC2_GPIOJ;
 
 	//
 	// Do a dummy read to insert a few cycles after enabling the peripheral.
 	//
-	ulLoop = SYSCTL_RCGC2_R;
+	ulIOBits = SYSCTL_RCGC2_R;
 
 	//
-	// Enable the GPIO pin for the LED (PF3).  Set the direction as output, and
+	// Enable the GPIO pin for the LEDs (PF2, PF3).  Set the direction as output, and
 	// enable the GPIO pin for digital function.
+	//
+	GPIO_PORTF_DIR_R = BIT(3) | BIT(2);
+	GPIO_PORTF_DEN_R = BIT(3) | BIT(2);
+
+	//
+	// Enable the GPIO pin for the BUTTON (PJ7).  Set the direction as input, and
+	// enable the GPIO pin for digital function.
+	//
+	GPIO_PORTJ_DEN_R = BIT(7);
+	ulIOBits = 0;
+	
+	//
 	// Run the timer at once with interrupts.
 	//
-	GPIO_PORTF_DIR_R = BIT(3);
-	GPIO_PORTF_DEN_R = BIT(3);
 	NVIC_ST_CTRL_R |= NVIC_ST_CTRL_ENABLE | NVIC_ST_CTRL_INTEN;
 
 	//
@@ -71,5 +81,17 @@ int main()
 	//
 	for(;;)
 	{
+
+		//
+		// Reflect the button's state on second LED with every change.
+		//
+		if ((GPIO_PORTJ_DATA_R & BIT(7)) != (ulIOBits & BIT(7)))
+		{
+			if ((GPIO_PORTJ_DATA_R & BIT(7)) == 0)
+				GPIO_PORTF_DATA_R &= ~BIT(2);
+			else
+				GPIO_PORTF_DATA_R |= BIT(2);
+			ulIOBits = GPIO_PORTJ_DATA_R;
+		}
 	}
 }
