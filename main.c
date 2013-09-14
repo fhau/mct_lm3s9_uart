@@ -16,6 +16,7 @@
 
 /* private macros */
 #define BIT(n)		(1 << n)
+#define SYSCLK    80000000
 
 /* private function prototypes */
 void SysTickISR()
@@ -31,6 +32,7 @@ void SysTickISR()
 	//
   ulShadow = NVIC_INT_CTRL_R & ~NVIC_INT_CTRL_UNPEND_SV | NVIC_INT_CTRL_PENDSTCLR;
 	NVIC_INT_CTRL_R = ulShadow;
+
 	// Needs appx. 800 ns at 80 MHz.
 }
 
@@ -43,7 +45,7 @@ int main()
 	// Initialize the System Tick Timer for 333 ms light change, then
 	// clear the counting element
 	//
-	NVIC_ST_CURRENT_R = NVIC_ST_RELOAD_R = 13333333;
+	NVIC_ST_CURRENT_R = NVIC_ST_RELOAD_R = SYSCLK / (3 * 2);
 
 	//
 	// Enable the GPIO port that is used for the on-board LED.

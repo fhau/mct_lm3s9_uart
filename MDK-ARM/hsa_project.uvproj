@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>BLINK</TargetName>
+      <TargetName>UART</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
