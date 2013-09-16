@@ -2,12 +2,15 @@
    File:        main.c
 	 Title:       communicate through UART
 	 Purpose:     LM3S9D96-DK
-	              blink user led, spaced by time
-                loops
+	              communicate through RS232
 	 Business:    HSA Elektrotechnik
 	 Compiler:    MDK-ARM
 	 Author/Date: Franz Haunstetter / 09.09.13
 	 Comment:     new
+	 Author/Date: Franz Haunstetter / 14.09.13
+	 Comment:     User button polling
+	 Author/Date: Franz Haunstetter / 16.09.13
+	 Comment:     RS232 serial in- and output
    *********************************************
 */
 
@@ -19,69 +22,44 @@
 #define SYSCLK    80000000
 
 /* private function prototypes */
-void SysTickISR()
-{
-	unsigned long ulShadow;
-	//
-	// Toggle the LED each time the counter reaches 0.
-	//
-	GPIO_PORTF_DATA_R ^= BIT(3);
-	//
-	// To avoid jitter at small division values remove the ST pending flag
-	// and leave the others unchanged (must write 0 to write only bits).
-	//
-  ulShadow = NVIC_INT_CTRL_R & ~NVIC_INT_CTRL_UNPEND_SV | NVIC_INT_CTRL_PENDSTCLR;
-	NVIC_INT_CTRL_R = ulShadow;
-
-	// Needs appx. 800 ns at 80 MHz.
-}
-
+void init(void);						// initialize.c
+void init_sys(void);				// system.c
+void SysTickRun(void);
+void SysTickISR(void);
+void init_rs232(void);			// rs232.c
+int send_rs232( char c );
+int rec_rs232( char* buf );
+void init_IO(void);					// GPIO.c
 
 int main()
 {
-	volatile unsigned long ulIOBits;
+	volatile unsigned long ulIOBits = 0;
+	char c;
 	
 	//
-	// Initialize the System Tick Timer for 333 ms light change, then
-	// clear the counting element
+	// Initialize all device ressources.
 	//
-	NVIC_ST_CURRENT_R = NVIC_ST_RELOAD_R = SYSCLK / (3 * 2);
-
-	//
-	// Enable the GPIO ports used.
-	//
-	SYSCTL_RCGC2_R = SYSCTL_RCGC2_GPIOF | SYSCTL_RCGC2_GPIOJ;
-
-	//
-	// Do a dummy read to insert a few cycles after enabling the peripheral.
-	//
-	ulIOBits = SYSCTL_RCGC2_R;
-
-	//
-	// Enable the GPIO pin for the LEDs (PF2, PF3).  Set the direction as output, and
-	// enable the GPIO pin for digital function.
-	//
-	GPIO_PORTF_DIR_R = BIT(3) | BIT(2);
-	GPIO_PORTF_DEN_R = BIT(3) | BIT(2);
-
-	//
-	// Enable the GPIO pin for the BUTTON (PJ7).  Set the direction as input, and
-	// enable the GPIO pin for digital function.
-	//
-	GPIO_PORTJ_DEN_R = BIT(7);
-	ulIOBits = 0;
+	init_sys();
+	init_rs232();
+	init_IO();
 	
 	//
 	// Run the timer at once with interrupts.
 	//
-	NVIC_ST_CTRL_R |= NVIC_ST_CTRL_ENABLE | NVIC_ST_CTRL_INTEN;
+	SysTickRun();
 
 	//
 	// Run the action in a superloop.
 	//
 	for(;;)
 	{
-
+		//
+		// Wait for character from remote and
+		// echo with shift to console
+		//
+		while (!rec_rs232( &c ));
+		while (!send_rs232(c>='A' && c<='Z'? c+32: '*'));
+		
 		//
 		// Reflect the button's state on second LED with every change.
 		//

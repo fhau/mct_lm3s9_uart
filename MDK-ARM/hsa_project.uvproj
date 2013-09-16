@@ -130,7 +130,7 @@
           <Target>
             <UseTarget>1</UseTarget>
             <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
-            <RunToMain>1</RunToMain>
+            <RunToMain>0</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
             <RestoreWatchpoints>1</RestoreWatchpoints>
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
@@ -407,10 +407,32 @@
               <FileType>2</FileType>
               <FilePath>..\setclock.s</FilePath>
             </File>
+            <File>
+              <FileName>rs232.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\rs232.c</FilePath>
+            </File>
+            <File>
+              <FileName>system.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\system.c</FilePath>
+            </File>
+            <File>
+              <FileName>GPIO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GPIO.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Header</GroupName>
+          <Files>
+            <File>
+              <FileName>lm3s9d96.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\inc\lm3s9d96.h</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>Documents</GroupName>
