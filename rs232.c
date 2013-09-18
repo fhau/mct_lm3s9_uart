@@ -21,6 +21,11 @@
 #define DIVINT    SYSCLK / (16*BDR)
 #define DIVFRAC   (((SYSCLK / (16.0*BDR)) - DIVINT)*64+0.5)
 
+#define IPRIO			1
+
+/* global buffers */
+extern char c;
+
 //
 // Initialize UART1 Rx/Tx on PD2/PD3 out of reset:
 // UART is idle, FIFO disabled and empty.
@@ -48,6 +53,14 @@ void init_rs232()
 	
 	UART1_LCRH_R = UART_LCRH_WLEN_8;				// line controls
 	UART1_CTL_R |= UART_CTL_UARTEN;					// ready to run
+
+	//
+	// Enable receiver interrupts only.
+	//
+	UART1_IM_R = UART_IM_RXIM;
+	NVIC_PRI1_R &= ~NVIC_PRI1_INT6_M;
+	NVIC_PRI1_R |= IPRIO << 21;
+	NVIC_EN0_R |= NVIC_EN0_INT6;
 }
 
 //
@@ -83,4 +96,5 @@ int rec_rs232( char* buf )
 //
 void RxISR()
 {
+		c = UART1_DR_R;
 }

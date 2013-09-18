@@ -31,10 +31,13 @@ int send_rs232( char c );
 int rec_rs232( char* buf );
 void init_IO(void);					// GPIO.c
 
+/* global buffers */
+char c;
+
 int main()
 {
 	volatile unsigned long ulIOBits = 0;
-	char c;
+//	char c;
 	
 	//
 	// Initialize all device ressources.
@@ -57,8 +60,12 @@ int main()
 		// Wait for character from remote and
 		// echo with shift to console
 		//
-		while (!rec_rs232( &c ));
-		while (!send_rs232(c>='A' && c<='Z'? c+32: '*'));
+//		while (!rec_rs232( &c ));
+		if (c > 0)
+		{
+			while (!send_rs232(c>='A' && c<='Z'? c+32: c));
+			c = 0;
+		}
 		
 		//
 		// Reflect the button's state on second LED with every change.

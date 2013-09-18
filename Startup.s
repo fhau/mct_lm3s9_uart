@@ -24,6 +24,8 @@
 ; Author/Date: Franz Haunstetter / 09.09.13
 ; Comment:     Init system clock to 80 MHz using external oscillator
 ;              SystemTickTimer interrupt handler address
+; Author/Date: Franz Haunstetter / 17.09.13
+; Comment:     UART1 interrupt handler address
 ;
 ;******************************************************************************
 
@@ -84,6 +86,7 @@ __heap_limit
 ;******************************************************************************
         EXPORT  __Vectors
 		IMPORT  SysTickISR                  ; #fhau: from Application
+		IMPORT  RxISR                       ; #fhau: from Application
 __Vectors
         DCD     StackMem + Stack            ; Top of Stack
         DCD     Reset_Handler               ; Reset Handler
@@ -107,7 +110,7 @@ __Vectors
         DCD     IntDefaultHandler           ; GPIO Port D
         DCD     IntDefaultHandler           ; GPIO Port E
         DCD     IntDefaultHandler           ; UART0 Rx and Tx
-        DCD     IntDefaultHandler           ; UART1 Rx and Tx
+        DCD     RxISR                       ; #fhau: UART1 Rx and Tx
         DCD     IntDefaultHandler           ; SSI0 Rx and Tx
         DCD     IntDefaultHandler           ; I2C0 Master and Slave
         DCD     IntDefaultHandler           ; PWM Fault
